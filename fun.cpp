@@ -22,3 +22,15 @@ int* lens_of_sentens(int *points, int sz) {
     }
     return lens;
 }
+
+int* coord_of_spaces(char *max_sent, int spaces_cnt, int sz) {
+    int *spaces = new int [spaces_cnt];
+    int temp_cnt = 0;
+    for (int i = 0; i < sz; ++i) {
+        if (max_sent[i] == ' ') {
+            spaces[temp_cnt] = i;
+            ++temp_cnt;
+        }
+    }
+    return spaces;
+}

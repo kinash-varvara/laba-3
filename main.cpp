@@ -15,7 +15,7 @@ int main(int argc, char ** argv){
     const char* to_file = "-1";
 
     if (argc == 1) {
-        cout << "Whitoutfiles\n";
+        cout << "Whithoutfiles\n";
     }
     else if (argc % 2 == 0 || argc > 5) {
         std::cerr << "Incorrect format for flags";
@@ -37,15 +37,15 @@ int main(int argc, char ** argv){
     }
     else if (argc == 5) {
         if (std::strcmp(argv[1], "--fromfile") == 0 and std::strcmp(argv[3], "--tofile") == 0){
-            cout << "from " << argv[2] << " file";
+            //cout << "from " << argv[2] << " file";
             from_file = argv[2];
-            cout << "to " << argv[4] << " file";
+            //cout << "to " << argv[4] << " file";
             to_file = argv[4];
         }
         else if (std::strcmp(argv[1], "--tofile") == 0 and std::strcmp(argv[3], "--fromfile") == 0 ){
-            cout << "from " << argv[4] << " file";
+            //cout << "from " << argv[4] << " file";
             from_file = argv[4];
-            cout << "to " << argv[2] << " file";
+            //cout << "to " << argv[2] << " file";
             to_file = argv[2];
         }
         else {
@@ -88,8 +88,6 @@ int main(int argc, char ** argv){
         order_of_sentences[i] = i;
     }
 
-
-
     for (int i = 0; i < points_cnt; i++) {
         for (int j = 0; j < points_cnt - 1; j++) {
             if (lens[j] > lens[j + 1]) {
@@ -99,7 +97,7 @@ int main(int argc, char ** argv){
         }
     }
 
-    
+    int max_start, max_end;
 
     if (strcmp(to_file, "-1") == 0) {
         for (int i = 0; i < points_cnt; ++i) {
@@ -107,6 +105,10 @@ int main(int argc, char ** argv){
             if (order_of_sentences[i] == 0) {
                 start = 0;
                 end = points[0];
+            }
+            if (i == points_cnt - 1) {
+                max_start = start;
+                max_end = end;
             }
             for (int j = start; j <= end; ++j) {
                 cout << s[j];
@@ -124,6 +126,11 @@ int main(int argc, char ** argv){
                 start = 0;
                 end = points[0];
             }
+            if (i == points_cnt - 1) {
+                max_start = start;
+                max_end = end;
+            }
+            cout << start << ' ' << end << '\n';
             for (int j = start; j <= end; ++j) {
                 fout << s[j];
             }
@@ -132,10 +139,56 @@ int main(int argc, char ** argv){
         fout.close();
     }
 
+    
+
+    cout << max_start << ' ' << max_end << '\n';
+    int max_sz = max_end - max_start + 1;
+    char * max_sent = new char [max_sz];
+    
+    int spaces_cnt = 0;
+    for (int i = max_start; i <= max_end; ++i) {
+        max_sent[i - max_start] = s[i];
+        if (s[i] == ' ') {
+            ++spaces_cnt;
+        }
+    }
+
+    int *spaces = coord_of_spaces(max_sent, spaces_cnt, max_sz);
+    for (int i = 0; i < max_sz; ++i) {
+        cout << max_sent[i];
+    }
+    for (int i = 0; i < spaces_cnt; ++i) {
+        cout << spaces[i] << ' ';
+    }
+
+    std::ofstream fout;
+    fout.open("NINE.txt");
+
+    for (int i = spaces_cnt - 1; i >= 0; --i) {
+        int temp_end, j;
+        if (i == spaces_cnt - 1) {
+            temp_end = max_sz - 1;
+            j = spaces[i] + 1;
+        }
+        else {
+            temp_end = spaces[i + 1];
+            j = spaces[i];
+        }
+
+        for (j; j < temp_end; ++j) {
+            fout << max_sent[j];
+        }
+    }
+    fout << ' ';
+    for (int i = 0; i < spaces[0]; ++i) {
+        fout << max_sent[i];
+    }
+
     delete [] s;
     delete [] points;
     delete [] lens;
     delete [] order_of_sentences;
-
+    delete [] spaces;
+    delete [] max_sent;
     return 0;
 }
