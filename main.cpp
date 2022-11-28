@@ -37,15 +37,15 @@ int main(int argc, char ** argv){
     }
     else if (argc == 5) {
         if (std::strcmp(argv[1], "--fromfile") == 0 and std::strcmp(argv[3], "--tofile") == 0){
-            //cout << "from " << argv[2] << " file";
+            cout << "from " << argv[2] << " file";
             from_file = argv[2];
-            //cout << "to " << argv[4] << " file";
+            cout << "to " << argv[4] << " file";
             to_file = argv[4];
         }
         else if (std::strcmp(argv[1], "--tofile") == 0 and std::strcmp(argv[3], "--fromfile") == 0 ){
-            //cout << "from " << argv[4] << " file";
+            cout << "from " << argv[4] << " file";
             from_file = argv[4];
-            //cout << "to " << argv[2] << " file";
+            cout << "to " << argv[2] << " file";
             to_file = argv[2];
         }
         else {
@@ -60,7 +60,7 @@ int main(int argc, char ** argv){
     char *s = new char [MAX_SIZE];
     int *points = new int [MAX_SIZE];
 
-    if (from_file != "-1") {
+    if (strcmp(from_file, "-1") != 0) {
         FILE* fp;
         int j = 0;
         fp = fopen(from_file, "r");
@@ -73,7 +73,7 @@ int main(int argc, char ** argv){
     
     cout << "Please write a space after the points at the end of sentences if there are further sentences in the same line.\n";
 
-    if (from_file == "-1") {
+    if (strcmp(from_file, "-1") == 0) {
         std::cout << "Enter text. \nTo mark the end of input, type '@' and press Enter.\n" << std::endl;
         std::cin.getline(s, 1024, '@');
     }
@@ -88,16 +88,7 @@ int main(int argc, char ** argv){
         order_of_sentences[i] = i;
     }
 
-    cout << "\nindex of points\n";
-    for (int i = 0; i < points_cnt; ++i) {
-        cout << points[i] << ' ';
-    }
 
-    cout << "\npoints in the incorrect order\n";
-    for (int i = 0; i < points_cnt; ++i) {
-        cout << order_of_sentences[i] << ' ' << lens[i] << '\n';
-    }
-    cout << '\n';
 
     for (int i = 0; i < points_cnt; i++) {
         for (int j = 0; j < points_cnt - 1; j++) {
@@ -108,30 +99,43 @@ int main(int argc, char ** argv){
         }
     }
 
-    /*cout << "symbols\n";
-    for (int i = 0; i < std::strlen(s); ++i) {
-        cout << s[i];
-    }*/
-
-
-    cout << "\npoints in the correct order\n";
-    for (int i = 0; i < points_cnt; ++i) {
-        cout << order_of_sentences[i] << ' ' << lens[i] << '\n';
-    }
-    cout << '\n';
     
-    //cout << "\nsentense\n";
 
-    /*for (int i = 0; i < points_cnt; ++i) {
-        cout << order_of_sentences[i] << ' ' << lens[i] << '\n';
+    if (strcmp(to_file, "-1") == 0) {
+        for (int i = 0; i < points_cnt; ++i) {
+            int start = points[order_of_sentences[i] - 1] + 2, end = points[order_of_sentences[i]];
+            if (order_of_sentences[i] == 0) {
+                start = 0;
+                end = points[0];
+            }
+            for (int j = start; j <= end; ++j) {
+                cout << s[j];
+            }
+            cout << '\n';
+        }
+    }
+    else {
+        std::ofstream fout;
+        fout.open(to_file);
 
-    }*/
-
-    //cout << "\nDone!";
+        for (int i = 0; i < points_cnt; ++i) {
+            int start = points[order_of_sentences[i] - 1] + 2, end = points[order_of_sentences[i]];
+            if (order_of_sentences[i] == 0) {
+                start = 0;
+                end = points[0];
+            }
+            for (int j = start; j <= end; ++j) {
+                fout << s[j];
+            }
+            fout << '\n';
+        }
+        fout.close();
+    }
 
     delete [] s;
     delete [] points;
     delete [] lens;
+    delete [] order_of_sentences;
 
     return 0;
 }
